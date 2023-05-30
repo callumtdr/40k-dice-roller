@@ -15,10 +15,15 @@ namespace dice_roller
             while (playing)
             {
                 Console.Clear();
+
                 int manyDice = 0;
                 int hitsOn = 0;
                 int numOfHits = 0;
+                int wepStr = 0;
+                int unitTough = 0;
+                int woundsOn = 0;
 
+                int[] woundHits = { 2, 3, 4, 5, 6 };
 
                 List<int> diceRolls = new List<int>();
 
@@ -64,6 +69,8 @@ namespace dice_roller
 
                 roller.DiceRoll(manyDice, diceRolls);
 
+                //Detecting Nat 1's
+
                 bool hasOnes = diceRolls.Contains(1);
 
                 bool validChoice = false;
@@ -72,9 +79,7 @@ namespace dice_roller
                 {
                     int onesCount = diceRolls.Count(d => d == 1);
 
-                    Console.WriteLine($"You rolled {onesCount} 1's.");
-
-                    
+                    Console.WriteLine($"You rolled {onesCount} 1's.");    
 
                     while (!validChoice)
                     {
@@ -119,6 +124,52 @@ namespace dice_roller
                     }
                 }
 
+                //Exploding 6's
+                bool hasSixes = diceRolls.Contains(6);
+
+                validChoice = false;
+
+                if (hasSixes) 
+                {
+                    int sixCount = diceRolls.Count(d => d == 6);
+
+                    Console.WriteLine($"You rolled {sixCount} 6's.");
+
+                    while (!validChoice)
+                    {
+                        Console.WriteLine("Do your Sixes explode? Y/N");
+
+                        string sixSplode = Console.ReadLine();
+
+                        if (sixSplode == "y")
+                        {
+
+                            for (int i = 0; i < sixCount; i++)
+                            {
+                                numOfHits++;
+                            }
+                            Console.WriteLine($"You've made {numOfHits} extra hit's");
+                            validChoice = true;
+
+                        }
+
+                        else if (sixSplode == "n")
+                        {
+                            validChoice = true;
+                        }
+
+                        else
+                        {
+                            Console.WriteLine("I dont understand, try again");
+                            validChoice = false;
+                        }
+
+                    }
+                }
+
+
+                //Adding Modifiers.
+
                 validChoice = false;
 
                 while (!validChoice)
@@ -140,8 +191,8 @@ namespace dice_roller
                                 diceRolls[i] += mod;
                             }
                         }
-
-                            validChoice = true;
+                        
+                        validChoice = true;
                     }
                     else if (hasMod == "n") 
                     { 
@@ -161,11 +212,86 @@ namespace dice_roller
                     {
                         numOfHits++;
                     }
-                    //Console.WriteLine(d);
+                    Console.WriteLine(d);
                 }
 
-                Console.WriteLine($"youve hit {numOfHits} times.");
+                Console.WriteLine($"You've hit {numOfHits} times.");
                 Console.ReadLine();
+
+                //To Wound
+                validNum = false;
+
+                while (!validNum)
+                {
+                    Console.WriteLine("Enter weapon Strength");
+                    string input = Console.ReadLine();
+
+                    if (int.TryParse(input, out wepStr))
+                    {
+                        validNum = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Try entering a number");
+                    }
+                }
+
+
+                validNum = false;
+
+                while (!validNum)
+                {
+                    Console.WriteLine("Enter Unit Toughness");
+                    string input = Console.ReadLine();
+
+                    if (int.TryParse(input, out unitTough))
+                    {
+                        validNum = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Try entering a number");
+                    }
+                }
+
+                //calculate WoundsOn
+
+                if (wepStr >= 2 * unitTough)
+                {
+                    woundsOn = woundHits[0];
+                }
+                else if (wepStr > unitTough)
+                {
+                    woundsOn = woundHits[1];
+                }
+                else if (wepStr == unitTough)
+                {
+                    woundsOn = woundHits[2];
+                }
+                else if (unitTough >= 2 * wepStr)
+                {
+                    woundsOn = woundHits[4];
+                }
+                else if (wepStr < unitTough)
+                {
+                    woundsOn = woundHits[3];
+                }
+
+                Console.WriteLine($"you will wound on {woundsOn}+");
+
+                manyDice = numOfHits;
+
+                diceRolls.Clear();
+
+                roller.DiceRoll(manyDice, diceRolls);
+
+                foreach (var item in diceRolls)
+                {
+                    Console.Write(item);
+                }
+                Console.ReadLine();
+
+
             }
         }
     }
