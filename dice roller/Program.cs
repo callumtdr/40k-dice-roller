@@ -18,10 +18,15 @@ namespace dice_roller
 
                 int manyDice = 0;
                 int hitsOn = 0;
+                int explSix = 0;
                 int numOfHits = 0;
                 int wepStr = 0;
                 int unitTough = 0;
                 int woundsOn = 0;
+                int numOfWounds = 0;
+                int apValue = 0;
+                int defSave = 0;
+                int woundsTaken = 0;
 
                 int[] woundHits = { 2, 3, 4, 5, 6 };
 
@@ -144,11 +149,33 @@ namespace dice_roller
                         if (sixSplode == "y")
                         {
 
+                            
+
+                            validNum = false;
+
+                            while (!validNum)
+                            {
+                                Console.WriteLine("how many hits does it apply?");
+
+                                string input = Console.ReadLine();
+
+                                if (int.TryParse(input, out explSix))
+                                {
+                                    validNum = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Try Entering a number");
+                                }
+
+                            }
+
                             for (int i = 0; i < sixCount; i++)
                             {
-                                numOfHits++;
+                                numOfHits = numOfHits + explSix - 1;
                             }
                             Console.WriteLine($"You've made {numOfHits} extra hit's");
+
                             validChoice = true;
 
                         }
@@ -212,7 +239,6 @@ namespace dice_roller
                     {
                         numOfHits++;
                     }
-                    Console.WriteLine(d);
                 }
 
                 Console.WriteLine($"You've hit {numOfHits} times.");
@@ -278,6 +304,8 @@ namespace dice_roller
                 }
 
                 Console.WriteLine($"you will wound on {woundsOn}+");
+                Console.WriteLine("Hit any key to roll your wounds...");
+                Console.ReadLine();
 
                 manyDice = numOfHits;
 
@@ -287,10 +315,65 @@ namespace dice_roller
 
                 foreach (var item in diceRolls)
                 {
-                    Console.Write(item);
+                    if (item >= woundsOn)
+                    {
+                        numOfWounds++;
+                    }
                 }
-                Console.ReadLine();
 
+                Console.WriteLine($"you make {numOfWounds} Wounds");
+
+                Console.ReadLine(); 
+
+                validNum = false;
+
+                while (!validNum)
+                {
+                    Console.WriteLine("what is the attacks AP?");
+                    string input = Console.ReadLine();
+
+                    if (int.TryParse(input, out apValue))
+                    {
+                        validNum = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Try entering a number");
+                    }
+                }
+
+                validNum = false;
+
+                while (!validNum)
+                {
+                    Console.WriteLine("What is the defending units Save?");
+                    string input = Console.ReadLine();
+
+                    if (int.TryParse(input, out defSave))
+                    {
+                        validNum = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Try entering a number");
+                    }
+                }
+
+                diceRolls.Clear();
+                manyDice = numOfWounds;
+
+                roller.DiceRoll(manyDice, diceRolls);
+
+                foreach (var item in diceRolls)
+                {
+                    if (item < defSave + apValue)
+                    {
+                        woundsTaken++;
+                    }
+                }
+
+                Console.WriteLine($"Defending unit has received {woundsTaken} wounds");
+                Console.ReadLine();
 
             }
         }
